@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+
+</head>
+
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
+    <div id="login" class="loginbox">
+        <img src="css/avatar2.png" class="avatar">
+        <h1>Login</h1>
+        <form>
+            <input type="text" name="username" placeholder="Username" v-model="input.username" />
+            <input type="password" name="password" v-model="input.password" placeholder="Password" />
+            <button type="button" class="btn" @click="login()">Login</button>
+        </form>
+
+    </div>
+</body>
+
+</html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script src='js/jwt-decode.js'></script>
+<script>
+    var login = new Vue({
+        el: "#login",
+        data: {
+            input: {
+                username: "",
+                password: ""
+            },
+
+        },
+        methods: {
+    //la methode login 
+            login() {
+
+                const data = new URLSearchParams()
+
+                data.append('grant_type', 'password')
+                data.append('username', this.input.username)
+                data.append('password', this.input.password)
+                data.append('client_id', 'login-app')
+
+
+                const url = 'http://localhost:8080/auth/realms/keycloak-vue-php/protocol/openid-connect/token'
+                axios.post(
+                    url,
+                    data, {
+                        headers: {
+                            'content-type': 'application/x-www-form-urlencoded',
+                        }
+
+                    }).then((response) => {
+
+                    window.localStorage.setItem("vue-token", response.data.access_token)
+                    window.localStorage.setItem("vue-refresh-token", response.data.refresh_token)
+
+
+                    var decoded = jwt_decode(window.localStorage.getItem("vue-token"));
+                    var role = decoded.realm_access.roles;
+                    if (role.includes("user") || (role.includes("admin"))) {
+                        location.href = "http://localhost/crud-vue-php";
+
+                    } 
+                },(error)=>{
+                alert ("verifiez vos données");
+
+                });
+
+
+
+
+
+
+
+
+            }
+
+
+        }
+
+    })
+</script>

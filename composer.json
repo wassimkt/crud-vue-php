@@ -1,0 +1,6 @@
+{
+    "require": {
+        "miladrahimi/php-jwt": "^2.1",
+        "nowakowskir/php-jwt": "^2.0"
+    }
+}
